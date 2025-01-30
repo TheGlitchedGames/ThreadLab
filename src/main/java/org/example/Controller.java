@@ -6,7 +6,7 @@ public class Controller {
 
     public Controller() {
         myModel = new MyModel();
-        myView = new MyView();
+        myView = new MyView(myModel.getResource());
     }
 
     public void getModalInfo() {
