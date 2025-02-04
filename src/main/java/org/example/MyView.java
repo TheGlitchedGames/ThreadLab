@@ -4,7 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyView extends JFrame {
-    public MyView(Resource resource) {
+    private DataPanel dataPanel;
+    private ConfigurationPanel configurationPanel;
+    private Viewer viewer;
+
+    public MyView(Resource resource, Controller controller, MyModel model) {
         setTitle("ThreadLab");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
@@ -39,7 +43,7 @@ public class MyView extends JFrame {
         gbc.gridheight = 1;
         gbc.weightx = 0.4; // 2/5 of the width
         gbc.weighty = 0.9;
-        add(new Viewer(), gbc);
+        add(new Viewer(model), gbc);
 
         // ControlPanel at the bottom
         gbc.gridx = 0;
@@ -48,8 +52,13 @@ public class MyView extends JFrame {
         gbc.gridheight = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        add(new ControlPanel(), gbc);
+        add(new ControlPanel(controller), gbc);
 
         setVisible(true);
+    }
+
+    public void updateData() {
+        configurationPanel.updateResourceData();
+        dataPanel.updateData(configurationPanel.getConfigData());
     }
 }
