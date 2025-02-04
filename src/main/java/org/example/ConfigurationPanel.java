@@ -82,6 +82,33 @@ public class ConfigurationPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    public void updateResourceData() {
+        DefaultTableModel model = (DefaultTableModel) configTable.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String value = (String) model.getValueAt(i, 1);
+            try {
+                int intValue = Integer.parseInt(value);
+                if (i == 2) {
+                    resource.setMaxQuantity(intValue);
+                } else if (i == 3) {
+                    resource.setMinQuantity(intValue);
+                }
+            } catch (NumberFormatException ex) {
+                // Handle invalid number format
+            }
+        }
+    }
+
+    public Object[][] getConfigData() {
+        DefaultTableModel model = (DefaultTableModel) configTable.getModel();
+        Object[][] data = new Object[model.getRowCount()][2];
+        for (int i = 0; i < model.getRowCount(); i++) {
+            data[i][0] = model.getValueAt(i, 0);
+            data[i][1] = model.getValueAt(i, 1);
+        }
+        return data;
+    }
+
     private static class BoldRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

@@ -25,4 +25,23 @@ public class DataPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(dataTable);
         add(scrollPane, BorderLayout.CENTER);
     }
+
+    public void updateData(Object[][] configData) {
+        DefaultTableModel model = (DefaultTableModel) dataTable.getModel();
+        for (Object[] row : configData) {
+            String parameter = (String) row[0];
+            String value = (String) row[1];
+            switch (parameter) {
+                case "Total Resources":
+                    model.setValueAt(value, 0, 1);
+                    break;
+                case "Number of Producers":
+                    model.setValueAt(value, 1, 1);
+                    break;
+                case "Number of Consumers":
+                    model.setValueAt(value, 2, 1);
+                    break;
+            }
+        }
+    }
 }
