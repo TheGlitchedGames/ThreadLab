@@ -9,6 +9,7 @@ public class Producer implements Runnable{
     private String state;
     private String startTime;
     private String stopTime;
+    private int timesProduced = 0;
 
     public Producer(Resource resource) {
         this.resource = resource;
@@ -39,6 +40,7 @@ public class Producer implements Runnable{
         synchronized (resource) {
             if (resource.getQuantity() < resource.getMaxQuantity()) {
                 resource.increment();
+                timesProduced++;
             }
         }
     }
@@ -52,5 +54,9 @@ public class Producer implements Runnable{
 
     public String getStopTime() {
         return stopTime;
+    }
+
+    public int getTimesProduced() {
+        return timesProduced;
     }
 }

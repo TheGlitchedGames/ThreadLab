@@ -11,9 +11,11 @@ import java.awt.*;
 public class ConfigurationPanel extends JPanel {
     private JTable configTable;
     private Resource resource;
+    private MyModel myModel;
 
-    public ConfigurationPanel(Resource resource) {
-        this.resource = resource;
+    public ConfigurationPanel(MyModel myModel) {
+        this.myModel = myModel;
+        this.resource = myModel.getResource();
         setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("Configuration Settings", JLabel.CENTER);
@@ -23,18 +25,18 @@ public class ConfigurationPanel extends JPanel {
         String[] columnNames = {"Parameter", "Value"};
         Object[][] data = {
                 {"== Resource Type Settings ==", ""},
-                {"Total Resources", ""},
-                {"Max General Resources", ""},
-                {"Min General Resources", ""},
+                {"Total Resources", "1"},
+                {"Max General Resources", "100"},
+                {"Min General Resources", "0"},
                 {"== Producer/Consumer Count ==", ""},
-                {"Number of Producers", ""},
-                {"Number of Consumers", ""},
+                {"Number of Producers", "0"},
+                {"Number of Consumers", "0"},
         };
 
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 1;
+                return column == 1 && row != 0 && row != 4;
             }
         };
 
@@ -47,33 +49,29 @@ public class ConfigurationPanel extends JPanel {
                     String value = (String) model.getValueAt(row, column);
                     try {
                         int intValue = Integer.parseInt(value);
-                        if (row == 2) {
-                            resource.setMaxQuantity(intValue);
-                        } else if (row == 3) {
-                            resource.setMinQuantity(intValue);
+                        switch (row) {
+                            case 2: // Max General Resources
+                                resource.setMaxQuantity(intValue);
+                                break;
+                            case 3: // Min General Resources
+                                resource.setMinQuantity(intValue);
+                                break;
+                            case 5: // Number of Producers
+                                myModel.setProducerCount(intValue);
+                                break;
+                            case 6: // Number of Consumers
+                                myModel.setConsumerCount(intValue);
+                                break;
                         }
                     } catch (NumberFormatException ex) {
-                        // Handle invalid number format
+                        model.setValueAt("0", row, column);
                     }
                 }
             }
         });
 
-        configTable = new JTable(model) {
-            @Override
-            public TableCellRenderer getCellRenderer(int row, int column) {
-                if (column == 0 && (row == 0 || row == 4)) {
-                    return new BoldRenderer();
-                }
-                return super.getCellRenderer(row, column);
-            }
 
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == 1;
-            }
-        };
-
+        configTable = new JTable(model);
         configTable.setTableHeader(null);
         configTable.setRowHeight(30);
         configTable.getColumnModel().getColumn(0).setCellRenderer(new MergedCellRenderer());
@@ -84,19 +82,11 @@ public class ConfigurationPanel extends JPanel {
 
     public void updateResourceData() {
         DefaultTableModel model = (DefaultTableModel) configTable.getModel();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String value = (String) model.getValueAt(i, 1);
-            try {
-                int intValue = Integer.parseInt(value);
-                if (i == 2) {
-                    resource.setMaxQuantity(intValue);
-                } else if (i == 3) {
-                    resource.setMinQuantity(intValue);
-                }
-            } catch (NumberFormatException ex) {
-                // Handle invalid number format
-            }
-        }
+        Object[] resourceInfo = myModel.getResourceInfo();
+        model.setValueAt(String.valueOf(resourceInfo[1]), 2, 1); // Max
+        model.setValueAt(String.valueOf(resourceInfo[2]), 3, 1); // Min
+        model.setValueAt(String.valueOf(myModel.getActiveThreadCount()/2), 5, 1); // Producers
+        model.setValueAt(String.valueOf(myModel.getActiveThreadCount()/2), 6, 1); // Consumers
     }
 
     public Object[][] getConfigData() {
@@ -109,23 +99,13 @@ public class ConfigurationPanel extends JPanel {
         return data;
     }
 
-    private static class BoldRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            c.setFont(c.getFont().deriveFont(Font.BOLD));
-            return c;
-        }
-    }
-
     private static class MergedCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (row == 0 || row == 4) {
                 ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
-                table.getColumnModel().getColumn(1).setMinWidth(0);
-                table.getColumnModel().getColumn(1).setMaxWidth(0);
+                c.setFont(c.getFont().deriveFont(Font.BOLD));
             }
             return c;
         }

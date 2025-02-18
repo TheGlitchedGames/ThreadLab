@@ -12,11 +12,11 @@ public class DataPanel extends JPanel {
 
         String[] columnNames = {"Data", "Values"};
         Object[][] data = {
-                {"Total Resources", ""},
-                {"Total Producers", ""},
-                {"Total Consumers", ""},
-                {"Total resources quantity", ""},
-                {"Active Threads", ""}
+                {"Total Resources", "1"},
+                {"Total Producers", "0"},
+                {"Total Consumers", "0"},
+                {"Total resources quantity", "0"},
+                {"Active Threads", "0"}
         };
 
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
@@ -26,22 +26,12 @@ public class DataPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void updateData(Object[][] configData) {
-        DefaultTableModel model = (DefaultTableModel) dataTable.getModel();
-        for (Object[] row : configData) {
-            String parameter = (String) row[0];
-            String value = (String) row[1];
-            switch (parameter) {
-                case "Total Resources":
-                    model.setValueAt(value, 0, 1);
-                    break;
-                case "Number of Producers":
-                    model.setValueAt(value, 1, 1);
-                    break;
-                case "Number of Consumers":
-                    model.setValueAt(value, 2, 1);
-                    break;
-            }
-        }
+    public void updateData(MyModel model) {
+        DefaultTableModel tableModel = (DefaultTableModel) dataTable.getModel();
+        tableModel.setValueAt("1", 0, 1);
+        tableModel.setValueAt(String.valueOf(model.getProducerCount()), 1, 1); // Producers
+        tableModel.setValueAt(String.valueOf(model.getConsumerCount()), 2, 1); // Consumers
+        tableModel.setValueAt(String.valueOf(model.getTotalResourcesQuantity()), 3, 1); // Resource quantity
+        tableModel.setValueAt(String.valueOf(model.getActiveThreadCount()), 4, 1); // Active threads
     }
 }

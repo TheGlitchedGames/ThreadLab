@@ -1,11 +1,13 @@
 package org.example;
 
 public class Resource {
+    private String id;
     private int quantity;
     private int maxQuantity;
     private int minQuantity;
 
-    public Resource(int maxQuantity, int minQuantity) {
+    public Resource(String id, int maxQuantity, int minQuantity) {
+        this.id = id;
         this.quantity = 0;
         this.maxQuantity = maxQuantity;
         this.minQuantity = minQuantity;

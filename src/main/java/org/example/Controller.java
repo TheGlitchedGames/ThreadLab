@@ -1,34 +1,31 @@
 package org.example;
 
-import java.util.List;
+import javax.swing.*;
+import java.awt.event.ActionListener;
 
 public class Controller {
     private MyView myView;
     private MyModel myModel;
+    private Timer updateTimer;
 
     public Controller() {
         myModel = new MyModel();
         myView = new MyView(myModel.getResource(), this, myModel);
 
-        myModel.addProducer(new Producer(myModel.getResource()));
-        myModel.addConsumer(new Consumer(myModel.getResource()));
+        updateTimer = new Timer(100, e -> update());
     }
 
-    public void getModalInfo() {
-        List<Object[]> consumerInfo = myModel.getConsumerInfo();
-        List<Object[]> producerInfo = myModel.getProducerInfo();
-        Object[] resourceInfo = myModel.getResourceInfo();
+    private void update() {
+        myView.updateData();
     }
 
     public void play() {
         myModel.start();
+        updateTimer.start();
     }
 
     public void stop() {
         myModel.stop();
-    }
-
-    public void update() {
-        myView.updateData();
+        updateTimer.stop();
     }
 }

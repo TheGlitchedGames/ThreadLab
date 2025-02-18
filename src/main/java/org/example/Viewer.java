@@ -61,42 +61,32 @@ public class Viewer extends JPanel {
     }
 
     public void updateTables(MyModel model) {
-        Random random = new Random();
-
         DefaultTableModel resourceModel = (DefaultTableModel) resourceTable.getModel();
         resourceModel.setRowCount(0);
-        Object[] resourceInfo = model.getResourceInfo();
-        Object[] resourceRow = new Object[resourceTable.getColumnCount()];
-        resourceRow[0] = random.nextInt(1000); // Random Resource ID
-        System.arraycopy(resourceInfo, 0, resourceRow, 1, resourceInfo.length);
-        for (int i = resourceInfo.length + 1; i < resourceRow.length; i++) {
-            resourceRow[i] = random.nextInt(100);
+
+        for (Resource resource : model.getResources()) {
+            Object[] resourceInfo = model.getResourceInfo(resource);
+            Object[] resourceRow = new Object[]{
+                    resource.getId(),
+                    resourceInfo[0],
+                    resourceInfo[2],
+                    resourceInfo[1],
+                    model.getConsumerCount(resource),
+                    model.getProducerCount(resource)
+            };
+            resourceModel.addRow(resourceRow);
         }
-        resourceModel.addRow(resourceRow);
 
         DefaultTableModel consumerModel = (DefaultTableModel) consumerTable.getModel();
         consumerModel.setRowCount(0);
         for (Object[] row : model.getConsumerInfo()) {
-            Object[] consumerRow = new Object[consumerTable.getColumnCount()];
-            consumerRow[0] = random.nextInt(1000); // Random Consumer ID
-            consumerRow[3] = random.nextInt(100); // Random Start Delay
-            consumerRow[4] = random.nextInt(100); // Random Consume Delay
-            consumerRow[6] = random.nextInt(100); // Random Processing Time
-            System.arraycopy(row, 0, consumerRow, 2, row.length);
-            consumerModel.addRow(consumerRow);
+            consumerModel.addRow(row);
         }
 
         DefaultTableModel producerModel = (DefaultTableModel) producerTable.getModel();
         producerModel.setRowCount(0);
         for (Object[] row : model.getProducerInfo()) {
-            Object[] producerRow = new Object[producerTable.getColumnCount()];
-            producerRow[0] = random.nextInt(1000); // Random Producer ID
-            producerRow[3] = random.nextInt(100); // Random Start Delay
-            producerRow[4] = random.nextInt(100); // Random Produce Delay
-            producerRow[5] = random.nextInt(100); // Random Times Produced
-            producerRow[6] = random.nextInt(100); // Random Processing Time
-            System.arraycopy(row, 0, producerRow, 2, row.length);
-            producerModel.addRow(producerRow);
+            producerModel.addRow(row);
         }
     }
 }

@@ -7,8 +7,10 @@ public class MyView extends JFrame {
     private DataPanel dataPanel;
     private ConfigurationPanel configurationPanel;
     private Viewer viewer;
+    private MyModel model;
 
     public MyView(Resource resource, Controller controller, MyModel model) {
+        this.model = model;
         setTitle("ThreadLab");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
@@ -18,32 +20,36 @@ public class MyView extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.BOTH;
 
+        dataPanel = new DataPanel();
+        configurationPanel = new ConfigurationPanel(model);
+        viewer = new Viewer(model);
+
         // DataPanel at the top left
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 0.4; // 2/5 of the width
+        gbc.weightx = 0.4;
         gbc.weighty = 0.9;
-        add(new DataPanel(), gbc);
+        add(dataPanel, gbc);
 
         // ConfigurationPanel in the center
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 0.2; // 1/5 of the width
+        gbc.weightx = 0.2;
         gbc.weighty = 0.9;
-        add(new ConfigurationPanel(resource), gbc);
+        add(configurationPanel, gbc);
 
         // Viewer on the right
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 0.4; // 2/5 of the width
+        gbc.weightx = 0.4;
         gbc.weighty = 0.9;
-        add(new Viewer(model), gbc);
+        add(viewer, gbc);
 
         // ControlPanel at the bottom
         gbc.gridx = 0;
@@ -59,6 +65,7 @@ public class MyView extends JFrame {
 
     public void updateData() {
         configurationPanel.updateResourceData();
-        dataPanel.updateData(configurationPanel.getConfigData());
+        dataPanel.updateData(model);
+        viewer.updateTables(model);
     }
 }

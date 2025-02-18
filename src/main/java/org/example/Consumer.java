@@ -9,6 +9,7 @@ public class Consumer implements Runnable{
     private String state;
     private String startTime;
     private String stopTime;
+    private int timesConsumed = 0;
 
     public Consumer(Resource resource) {
         this.resource = resource;
@@ -40,6 +41,7 @@ public class Consumer implements Runnable{
         synchronized (resource) {
             if (resource.getQuantity() > resource.getMinQuantity()) {
                 resource.decrement();
+                timesConsumed++;
             }
         }
     }
@@ -54,5 +56,9 @@ public class Consumer implements Runnable{
 
     public String getStopTime() {
         return stopTime;
+    }
+
+    public int getTimesConsumed() {
+        return timesConsumed;
     }
 }
