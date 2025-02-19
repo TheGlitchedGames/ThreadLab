@@ -37,17 +37,14 @@ public class Resource {
     }
 
     public synchronized void increment() {
-        if (quantity < maxQuantity) {
-            quantity++;
-            notifyAll(); // Notifica a los consumidores que pueden consumir
-        }
+        quantity++;
+        notifyAll();
     }
 
     public synchronized void decrement() {
-        if (quantity > minQuantity) {
-            quantity--;
-            notifyAll(); // Notifica a los productores que pueden producir más
-        }
+        quantity--;
+        notifyAll();
     }
+
 
 }

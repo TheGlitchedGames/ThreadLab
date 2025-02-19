@@ -16,21 +16,20 @@ public class Producer implements Runnable {
     }
 
     public void run() {
-        startTime =
-                LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        startTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         state = "Running";
         while (running) {
             produce();
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000); // 2 second delay
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        stopTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm" +
-                ":ss"));
+        stopTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         state = "Stopped";
     }
+
 
     public void stop() {
         running = false;
@@ -40,7 +39,7 @@ public class Producer implements Runnable {
         synchronized (resource) {
             while (resource.getQuantity() >= resource.getMaxQuantity()) {
                 try {
-                    resource.wait(); // Espera hasta que Consumer consuma recursos
+                    resource.wait();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -51,6 +50,8 @@ public class Producer implements Runnable {
             resource.notifyAll();
         }
     }
+
+
 
     public String getState() {
         return state;

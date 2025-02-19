@@ -22,7 +22,7 @@ public class Consumer implements Runnable {
         while (running) {
             consume();
             try {
-                Thread.sleep(100); // Simula un tiempo de procesamiento
+                Thread.sleep(2000); // 2 second delay
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -30,6 +30,7 @@ public class Consumer implements Runnable {
         stopTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         state = "Stopped";
     }
+
 
     public void stop() {
         running = false;
@@ -40,18 +41,18 @@ public class Consumer implements Runnable {
             while (resource.getQuantity() <= resource.getMinQuantity()) {
                 try {
                     resource.wait();
-                    System.out.println("Consumer esperando..."); // Depuración
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
                 }
             }
-
             resource.decrement();
             timesConsumed++;
-            resource.notifyAll(); // Notifica a los productores que pueden seguir produciendo
+            resource.notifyAll();
         }
     }
+
+
 
 
     public String getState() {

@@ -44,12 +44,16 @@ public class MyModel {
     public void setProducerCount(int count) {
         while (producers.size() < count) {
             Resource randomResource = resources.get(random.nextInt(resources.size()));
-            producers.add(new Producer(randomResource));
+            Producer producer = new Producer(randomResource);
+            producers.add(producer);
+            new Thread(producer).start(); // Start the producer thread immediately
         }
         while (producers.size() > count) {
-            producers.remove(producers.size() - 1);
+            Producer producer = producers.remove(producers.size() - 1);
+            producer.stop();
         }
     }
+
 
     public void setConsumerCount(int count) {
         while (consumers.size() < count) {
