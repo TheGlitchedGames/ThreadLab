@@ -10,9 +10,18 @@ public class MyView extends JFrame {
     private ControlPanel controlPanel;
 
     public MyView() {
-        setTitle("ThreadLab");
+        setTitle("ThreadLab - Resource Management Simulator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
+        setPreferredSize(new Dimension(1200, 800));
+
+        // Set modern look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         initComponents();
         pack();
         setLocationRelativeTo(null);
@@ -20,8 +29,9 @@ public class MyView extends JFrame {
 
     private void initComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Add padding between components
 
-        //Configuration Panel (Left)
+        // Configuration Panel (Left)
         configPanel = new ConfigurationPanel();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -30,19 +40,19 @@ public class MyView extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         add(configPanel, gbc);
 
-        //Data Panel (Center)
+        // Data Panel (Center)
         dataPanel = new DataPanel();
         gbc.gridx = 1;
         gbc.weightx = 0.25;
         add(dataPanel, gbc);
 
-        //Viewer Panel (Right)
+        // Viewer Panel (Right)
         viewer = new Viewer();
         gbc.gridx = 2;
         gbc.weightx = 0.5;
         add(viewer, gbc);
 
-        //Control Panel (Bottom)
+        // Control Panel (Bottom)
         controlPanel = new ControlPanel();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -52,6 +62,7 @@ public class MyView extends JFrame {
         add(controlPanel, gbc);
     }
 
+    // Getters
     public ConfigurationPanel getConfigPanel() { return configPanel; }
     public DataPanel getDataPanel() { return dataPanel; }
     public Viewer getViewer() { return viewer; }
