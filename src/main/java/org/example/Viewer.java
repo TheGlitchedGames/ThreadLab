@@ -3,90 +3,95 @@ package org.example;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Random;
 
 public class Viewer extends JPanel {
     private JTable resourceTable;
     private JTable consumerTable;
     private JTable producerTable;
+    private DefaultTableModel resourceModel;
+    private DefaultTableModel consumerModel;
+    private DefaultTableModel producerModel;
 
     public Viewer(MyModel model) {
-        setLayout(new BorderLayout());
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.BOTH;
 
-        String[] resourceColumns = {"Resource ID", "Quantity", "MinQ", "MaxQ", "Consumer num", "Producer num"};
-        resourceTable = new JTable(new DefaultTableModel(null, resourceColumns));
-        JScrollPane resourceScrollPane = new JScrollPane(resourceTable);
+        // Resource Table
+        String[] resourceColumns = {"Resource ID", "Quantity", "MinQ", "MaxQ"};
+        resourceModel = new DefaultTableModel(resourceColumns, 0);
+        resourceTable = new JTable(resourceModel);
+        JScrollPane resourcePane = new JScrollPane(resourceTable);
 
-        String[] consumerColumns = {"Consumer ID", "Bound Resource", "Status", "Start Delay", "Consume Delay", "Times consumed", "Processing time", "Start time", "End time"};
-        consumerTable = new JTable(new DefaultTableModel(null, consumerColumns));
-        JScrollPane consumerScrollPane = new JScrollPane(consumerTable);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.33;
+        add(createTitledPanel("Resources", resourcePane), gbc);
 
-        String[] producerColumns = {"Producer ID", "Bound Resource", "Status", "Start Delay", "Produce Delay", "Times produced", "Processing time", "Start time", "End time"};
-        producerTable = new JTable(new DefaultTableModel(null, producerColumns));
-        JScrollPane producerScrollPane = new JScrollPane(producerTable);
+        // Consumer Table
+        String[] consumerColumns = {"Consumer ID", "Resource", "Status", "Times Consumed", "Start Time", "End Time"};
+        consumerModel = new DefaultTableModel(consumerColumns, 0);
+        consumerTable = new JTable(consumerModel);
+        JScrollPane consumerPane = new JScrollPane(consumerTable);
 
-        JPanel tablePanel = new JPanel(new GridLayout(3, 1));
-        tablePanel.add(resourceScrollPane);
-        tablePanel.add(consumerScrollPane);
-        tablePanel.add(producerScrollPane);
+        gbc.gridy = 1;
+        add(createTitledPanel("Consumers", consumerPane), gbc);
 
-        JComponent canvas = new JComponent() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g;
+        // Producer Table
+        String[] producerColumns = {"Producer ID", "Resource", "Status", "Times Produced", "Start Time", "End Time"};
+        producerModel = new DefaultTableModel(producerColumns, 0);
+        producerTable = new JTable(producerModel);
+        JScrollPane producerPane = new JScrollPane(producerTable);
 
-                g2.setColor(Color.RED);
-                g2.setStroke(new BasicStroke(3));
+        gbc.gridy = 2;
+        add(createTitledPanel("Producers", producerPane), gbc);
+    }
 
-                int width = getWidth();
-                int height = getHeight();
-
-                int topHeight = height / 4;
-                int middleHeight = height / 3;
-                int bottomHeight = height - (topHeight + middleHeight);
-
-                g2.drawRect(5, 5, width - 10, topHeight - 10); // Tabla de Recursos
-                g2.drawRect(5, topHeight + 5, width - 10, middleHeight - 10); // Tabla de Consumidores
-                g2.drawRect(5, topHeight + middleHeight + 5, width - 10, bottomHeight - 10); // Tabla de Productores
-            }
-        };
-
-        canvas.setOpaque(false);
-        setLayout(new OverlayLayout(this));
-        add(canvas);
-        add(tablePanel);
-
-        updateTables(model);
+    private JPanel createTitledPanel(String title, JComponent component) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(component, BorderLayout.CENTER);
+        return panel;
     }
 
     public void updateTables(MyModel model) {
-        DefaultTableModel resourceModel = (DefaultTableModel) resourceTable.getModel();
+        // Update Resource Table
         resourceModel.setRowCount(0);
-
         for (Resource resource : model.getResources()) {
-            Object[] resourceInfo = model.getResourceInfo(resource);
-            Object[] resourceRow = new Object[]{
+            resourceModel.addRow(new Object[]{
                     resource.getId(),
-                    resourceInfo[0],
-                    resourceInfo[2],
-                    resourceInfo[1],
-                    model.getConsumerCount(resource),
-                    model.getProducerCount(resource)
-            };
-            resourceModel.addRow(resourceRow);
+                    resource.getQuantity(),
+                    resource.getMinQuantity(),
+                    resource.getMaxQuantity()
+            });
         }
 
-        DefaultTableModel consumerModel = (DefaultTableModel) consumerTable.getModel();
-        consumerModel.setRowCount(0);
+        // Add new rows for Consumer activities
         for (Object[] row : model.getConsumerInfo()) {
-            consumerModel.addRow(row);
+            consumerModel.addRow(new Object[]{
+                    row[0], // Consumer ID
+                    row[1], // Resource ID
+                    row[2], // Status
+                    row[5], // Times Consumed
+                    row[7], // Start Time
+                    row[8]  // End Time
+            });
         }
 
-        DefaultTableModel producerModel = (DefaultTableModel) producerTable.getModel();
-        producerModel.setRowCount(0);
+        // Add new rows for Producer activities
         for (Object[] row : model.getProducerInfo()) {
-            producerModel.addRow(row);
+            producerModel.addRow(new Object[]{
+                    row[0], // Producer ID
+                    row[1], // Resource ID
+                    row[2], // Status
+                    row[5], // Times Produced
+                    row[7], // Start Time
+                    row[8]  // End Time
+            });
         }
     }
 }

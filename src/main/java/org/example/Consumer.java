@@ -3,7 +3,7 @@ package org.example;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class Consumer implements Runnable{
+public class Consumer implements Runnable {
     private final Resource resource;
     private volatile boolean running = true;
     private String state;
@@ -17,19 +17,17 @@ public class Consumer implements Runnable{
 
     @Override
     public void run() {
-        startTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH" +
-                ":mm:ss"));
+        startTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         state = "Running";
         while (running) {
             consume();
             try {
-                Thread.sleep(100);
+                Thread.sleep(100); // Simula un tiempo de procesamiento
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        stopTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm" +
-                ":ss"));
+        stopTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         state = "Stopped";
     }
 
@@ -39,12 +37,22 @@ public class Consumer implements Runnable{
 
     private void consume() {
         synchronized (resource) {
-            if (resource.getQuantity() > resource.getMinQuantity()) {
-                resource.decrement();
-                timesConsumed++;
+            while (resource.getQuantity() <= resource.getMinQuantity()) {
+                try {
+                    resource.wait();
+                    System.out.println("Consumer esperando..."); // Depuración
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
             }
+
+            resource.decrement();
+            timesConsumed++;
+            resource.notifyAll(); // Notifica a los productores que pueden seguir produciendo
         }
     }
+
 
     public String getState() {
         return state;
@@ -60,5 +68,9 @@ public class Consumer implements Runnable{
 
     public int getTimesConsumed() {
         return timesConsumed;
+    }
+
+    public Resource getResource() {
+        return resource;
     }
 }

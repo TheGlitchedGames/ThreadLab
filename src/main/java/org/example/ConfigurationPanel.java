@@ -3,19 +3,15 @@ package org.example;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class ConfigurationPanel extends JPanel {
     private JTable configTable;
-    private Resource resource;
     private MyModel myModel;
 
     public ConfigurationPanel(MyModel myModel) {
         this.myModel = myModel;
-        this.resource = myModel.getResource();
         setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("Configuration Settings", JLabel.CENTER);
@@ -24,11 +20,11 @@ public class ConfigurationPanel extends JPanel {
 
         String[] columnNames = {"Parameter", "Value"};
         Object[][] data = {
-                {"== Resource Type Settings ==", ""},
-                {"Total Resources", "1"},
-                {"Max General Resources", "100"},
-                {"Min General Resources", "0"},
-                {"== Producer/Consumer Count ==", ""},
+                {"=== Resource Settings ===", ""},
+                {"Number of Resources", "1"},
+                {"Max Resource Quantity", "100"},
+                {"Min Resource Quantity", "0"},
+                {"=== Thread Settings ===", ""},
                 {"Number of Producers", "0"},
                 {"Number of Consumers", "0"},
         };
@@ -43,18 +39,19 @@ public class ConfigurationPanel extends JPanel {
         model.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
-                if (column == 1) {
-                    String value = (String) model.getValueAt(row, column);
+                if (e.getColumn() == 1) {
                     try {
+                        String value = (String) model.getValueAt(e.getFirstRow(), 1);
                         int intValue = Integer.parseInt(value);
-                        switch (row) {
-                            case 2: // Max General Resources
-                                resource.setMaxQuantity(intValue);
+                        switch (e.getFirstRow()) {
+                            case 1: // Number of Resources
+                                myModel.setResourceCount(intValue);
                                 break;
-                            case 3: // Min General Resources
-                                resource.setMinQuantity(intValue);
+                            case 2: // Max Resource Quantity
+                                myModel.setMaxQuantityForAllResources(intValue);
+                                break;
+                            case 3: // Min Resource Quantity
+                                myModel.setMinQuantityForAllResources(intValue);
                                 break;
                             case 5: // Number of Producers
                                 myModel.setProducerCount(intValue);
@@ -64,50 +61,18 @@ public class ConfigurationPanel extends JPanel {
                                 break;
                         }
                     } catch (NumberFormatException ex) {
-                        model.setValueAt("0", row, column);
+                        model.setValueAt("0", e.getFirstRow(), 1);
                     }
                 }
             }
         });
 
-
         configTable = new JTable(model);
-        configTable.setTableHeader(null);
         configTable.setRowHeight(30);
-        configTable.getColumnModel().getColumn(0).setCellRenderer(new MergedCellRenderer());
+        configTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        configTable.getColumnModel().getColumn(1).setPreferredWidth(100);
 
         JScrollPane scrollPane = new JScrollPane(configTable);
         add(scrollPane, BorderLayout.CENTER);
-    }
-
-    public void updateResourceData() {
-        DefaultTableModel model = (DefaultTableModel) configTable.getModel();
-        Object[] resourceInfo = myModel.getResourceInfo();
-        model.setValueAt(String.valueOf(resourceInfo[1]), 2, 1); // Max
-        model.setValueAt(String.valueOf(resourceInfo[2]), 3, 1); // Min
-        model.setValueAt(String.valueOf(myModel.getActiveThreadCount()/2), 5, 1); // Producers
-        model.setValueAt(String.valueOf(myModel.getActiveThreadCount()/2), 6, 1); // Consumers
-    }
-
-    public Object[][] getConfigData() {
-        DefaultTableModel model = (DefaultTableModel) configTable.getModel();
-        Object[][] data = new Object[model.getRowCount()][2];
-        for (int i = 0; i < model.getRowCount(); i++) {
-            data[i][0] = model.getValueAt(i, 0);
-            data[i][1] = model.getValueAt(i, 1);
-        }
-        return data;
-    }
-
-    private static class MergedCellRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (row == 0 || row == 4) {
-                ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
-                c.setFont(c.getFont().deriveFont(Font.BOLD));
-            }
-            return c;
-        }
     }
 }

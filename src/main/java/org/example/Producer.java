@@ -3,7 +3,7 @@ package org.example;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class Producer implements Runnable{
+public class Producer implements Runnable {
     private final Resource resource;
     private volatile boolean running = true;
     private String state;
@@ -38,12 +38,20 @@ public class Producer implements Runnable{
 
     private void produce() {
         synchronized (resource) {
-            if (resource.getQuantity() < resource.getMaxQuantity()) {
-                resource.increment();
-                timesProduced++;
+            while (resource.getQuantity() >= resource.getMaxQuantity()) {
+                try {
+                    resource.wait(); // Espera hasta que Consumer consuma recursos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
             }
+            resource.increment();
+            timesProduced++;
+            resource.notifyAll();
         }
     }
+
     public String getState() {
         return state;
     }
@@ -58,5 +66,9 @@ public class Producer implements Runnable{
 
     public int getTimesProduced() {
         return timesProduced;
+    }
+
+    public Resource getResource() {
+        return resource;
     }
 }

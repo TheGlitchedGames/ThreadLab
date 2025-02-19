@@ -13,6 +13,10 @@ public class Resource {
         this.minQuantity = minQuantity;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public synchronized int getQuantity() {
         return quantity;
     }
@@ -35,12 +39,15 @@ public class Resource {
     public synchronized void increment() {
         if (quantity < maxQuantity) {
             quantity++;
+            notifyAll(); // Notifica a los consumidores que pueden consumir
         }
     }
 
     public synchronized void decrement() {
         if (quantity > minQuantity) {
             quantity--;
+            notifyAll(); // Notifica a los productores que pueden producir más
         }
     }
+
 }

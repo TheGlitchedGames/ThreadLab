@@ -9,9 +9,9 @@ public class MyView extends JFrame {
     private Viewer viewer;
     private MyModel model;
 
-    public MyView(Resource resource, Controller controller, MyModel model) {
+    public MyView(Controller controller, MyModel model) {
         this.model = model;
-        setTitle("ThreadLab");
+        setTitle("Resource Management Simulation");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
         setSize(1200, 800);
@@ -20,51 +20,50 @@ public class MyView extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.BOTH;
 
-        dataPanel = new DataPanel();
+        // ConfigurationPanel a la izquierda
         configurationPanel = new ConfigurationPanel(model);
-        viewer = new Viewer(model);
-
-        // DataPanel at the top left
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0.4;
-        gbc.weighty = 0.9;
-        add(dataPanel, gbc);
-
-        // ConfigurationPanel in the center
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0.2;
         gbc.weighty = 0.9;
         add(configurationPanel, gbc);
 
-        // Viewer on the right
-        gbc.gridx = 2;
+        // DataPanel en el centro
+        dataPanel = new DataPanel();
+        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 0.4;
+        gbc.weightx = 0.3;
+        gbc.weighty = 0.3;
+        add(dataPanel, gbc);
+
+        // Viewer a la derecha
+        viewer = new Viewer(model);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 2;
+        gbc.weightx = 0.5;
         gbc.weighty = 0.9;
         add(viewer, gbc);
 
-        // ControlPanel at the bottom
+        // ControlPanel en la parte inferior
+        ControlPanel controlPanel = new ControlPanel(controller);
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.gridwidth = 3;
-        gbc.gridheight = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        add(new ControlPanel(controller), gbc);
+        add(controlPanel, gbc);
 
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
     public void updateData() {
-        configurationPanel.updateResourceData();
         dataPanel.updateData(model);
         viewer.updateTables(model);
     }
