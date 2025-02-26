@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.time.LocalTime;
+import java.util.Random;
 
 public class Consumer implements Runnable{
     private int id;
@@ -27,9 +28,10 @@ public class Consumer implements Runnable{
                 if (consume()) {
                     timesConsumed++;
                 }
-                Thread.sleep(100);
+                Thread.sleep(50 + new Random().nextInt(100));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                break;
             }
 
         }
