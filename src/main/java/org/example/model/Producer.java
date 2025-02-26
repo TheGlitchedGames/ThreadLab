@@ -23,8 +23,13 @@ public class Producer implements Runnable{
         startTime = LocalTime.now();
 
         while (state) {
-            if (produce()) {
-                timesProduced++;
+            try {
+                if (produce()) {
+                    timesProduced++;
+                }
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 

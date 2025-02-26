@@ -23,10 +23,15 @@ public class Consumer implements Runnable{
         startTime = LocalTime.now();
 
         while (state) {
-
-            if (consume()) {
-                timesConsumed++;
+            try {
+                if (consume()) {
+                    timesConsumed++;
+                }
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
         }
 
         stopTime = LocalTime.now();
