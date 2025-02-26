@@ -1,6 +1,8 @@
 package org.example.view;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class MyView extends JFrame {
@@ -9,30 +11,53 @@ public class MyView extends JFrame {
     private Viewer viewer;
     private ControlPanel controlPanel;
 
+    // Paleta de colores para la aplicación
+    private static final Color BACKGROUND_COLOR = new Color(240, 240, 245);
+    private static final Color PANEL_COLOR = new Color(255, 255, 255);
+    private static final Color HEADER_COLOR = new Color(70, 130, 180);
+    private static final Color TEXT_COLOR = new Color(50, 50, 50);
+
     public MyView() {
-        setTitle("ThreadLab - Resource Management Simulator");
+        setTitle("ThreadLab - Monitor de Recursos");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
-        setPreferredSize(new Dimension(1200, 800));
 
-        // Set modern look and feel
+        // Establecer look and feel del sistema
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            // Configuración global de UI
+            UIManager.put("Table.gridColor", new Color(230, 230, 230));
+            UIManager.put("Table.selectionBackground", new Color(210, 230, 255));
+            UIManager.put("Panel.background", PANEL_COLOR);
+            UIManager.put("Label.foreground", TEXT_COLOR);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // Configurar apariencia de la ventana principal
+        getContentPane().setBackground(BACKGROUND_COLOR);
+        ((JComponent) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+
         initComponents();
         pack();
+        setMinimumSize(new Dimension(900, 600));
         setLocationRelativeTo(null);
     }
 
     private void initComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Add padding between components
+        gbc.insets = new Insets(5, 5, 5, 5); // Margen entre paneles
 
-        // Configuration Panel (Left)
+        // Panel de Configuración (Izquierda)
         configPanel = new ConfigurationPanel();
+        configPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(HEADER_COLOR, 1),
+                "Configuración",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Dialog", Font.BOLD, 12),
+                HEADER_COLOR));
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.25;
@@ -40,20 +65,41 @@ public class MyView extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         add(configPanel, gbc);
 
-        // Data Panel (Center)
+        // Panel de Datos (Centro)
         dataPanel = new DataPanel();
+        dataPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(HEADER_COLOR, 1),
+                "Estado del Sistema",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Dialog", Font.BOLD, 12),
+                HEADER_COLOR));
         gbc.gridx = 1;
         gbc.weightx = 0.25;
         add(dataPanel, gbc);
 
-        // Viewer Panel (Right)
+        // Panel de Visualización (Derecha)
         viewer = new Viewer();
+        viewer.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(HEADER_COLOR, 1),
+                "Monitoreo en Tiempo Real",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Dialog", Font.BOLD, 12),
+                HEADER_COLOR));
         gbc.gridx = 2;
         gbc.weightx = 0.5;
         add(viewer, gbc);
 
-        // Control Panel (Bottom)
+        // Panel de Control (Inferior)
         controlPanel = new ControlPanel();
+        controlPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(HEADER_COLOR, 1),
+                "Controles",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Dialog", Font.BOLD, 12),
+                HEADER_COLOR));
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
@@ -62,7 +108,6 @@ public class MyView extends JFrame {
         add(controlPanel, gbc);
     }
 
-    // Getters
     public ConfigurationPanel getConfigPanel() { return configPanel; }
     public DataPanel getDataPanel() { return dataPanel; }
     public Viewer getViewer() { return viewer; }

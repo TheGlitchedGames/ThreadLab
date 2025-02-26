@@ -23,14 +23,9 @@ public class Consumer implements Runnable{
         startTime = LocalTime.now();
 
         while (state) {
-            try {
-                if (consume()) {
-                    timesConsumed++;
-                }
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+
+            if (consume()) {
+                timesConsumed++;
             }
         }
 
